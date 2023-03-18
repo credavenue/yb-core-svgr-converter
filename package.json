@@ -1,0 +1,39 @@
+{
+	"name": "yb-core-svgr-converter",
+	"description": "Converts SVG file into SVGr file",
+	"version": "0.0.1",
+	"license": "UNLICENSED",
+	"bin": {
+		"yb-core-svgr-converter": "index.js",
+		"yb-svgr-converter": "index.js"
+	},
+	"author": {
+		"name": "Raja Vijaya Kumar",
+		"email": "rajavijayakumar.r@go-yubi.com",
+		"url": "https://github.com/rajavijayakumar-r"
+	},
+	"keywords": [
+		"yb-core-svgr-converter",
+		"Raja Vijaya Kumar"
+	],
+	"files": [
+		"index.js",
+		"utils"
+	],
+	"scripts": {
+		"format": "prettier --write \"./**/*.{js,json}\""
+	},
+	"dependencies": {
+		"chalk": "^4.1.2",
+		"cli-alerts": "^1.2.2",
+		"cli-handle-error": "^4.4.0",
+		"cli-handle-unhandled": "^1.1.1",
+		"cli-meow-help": "^3.1.0",
+		"cli-welcome": "^2.2.2",
+		"meow": "^9.0.0",
+		"@svgr/cli": "^6.5.1"
+	},
+	"devDependencies": {
+		"prettier": "^2.8.4"
+	}
+}
