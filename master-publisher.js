@@ -45,6 +45,9 @@ const { clear, debug, avoidNative } = flags;
         await exec(`cd yb-core-icon && npm publish`)
 
         console.log('Successfully published Icon Componnet. Version:- ', version)
+
+        console.log('Cleaning up...')
+        await exec('rm -rf yb-core-icon')
     } catch (error) {
         console.error(error)
     }
