@@ -29,6 +29,21 @@ const flags = {
 		default: false,
 		alias: `x`,
 		desc: `Converts only for React and discards the support of react-native-svg`
+	},
+	deleteIcons: {
+		type: `boolean`,
+		default: false,
+		desc: `Used to delete the existing Icons. Usage delete [array of icon.svg names]`
+	},
+	updateIcons: {
+		type: `boolean`,
+		default: false,
+		desc: `Used to update the existing Icons`
+	},
+	addIcons: {
+		type: `boolean`,
+		default: false,
+		desc: `Used to add new Icons`
 	}
 };
 
