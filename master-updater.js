@@ -7,6 +7,14 @@
  * @author Raja Vijaya Kumar <https://github.com/rajavijayakumar-r>
  */
 
+const {
+	SVG_SRC_DIR,
+	SVGR_SRC_DIR,
+	SVG_SRC_PATH,
+	CORE_ICON_REPO_NAME,
+    CORE_ICON_REPO_LINK
+} = require('./constants')
+
 const fs = require('fs');
 const util = require('util');
 const exec = util.promisify(require('child_process').exec);
@@ -26,8 +34,8 @@ const { clear, debug, avoidNative, deleteIcons, updateIcons, addIcons } = flags;
 	console.log(flags)
 	console.log("printing nonNative: ", avoidNative)
 
-    const yb_core_icon_git_url = 'https://github.com/credavenue/yb-core-icon'
-    const yb_core_icon_dir_name = 'yb-core-icon'
+    const yb_core_icon_git_url = CORE_ICON_REPO_LINK
+    const yb_core_icon_dir_name = CORE_ICON_REPO_NAME
 
     try {
         console.log(`Clonning repository '${yb_core_icon_git_url}'...`);
@@ -35,27 +43,32 @@ const { clear, debug, avoidNative, deleteIcons, updateIcons, addIcons } = flags;
         console.log('Repository cloned successfully');
 
         if (addIcons) {
-            console.log(`Copying converted svg files into yb-core-icon project...`);
-            await exec(`cp -R dest_svgr/* yb-core-icon/src/svgr/`)
+            console.log(`Copying converted svg files into ${CORE_ICON_REPO_NAME} project...`);
+            await exec(`cp -R ${SVGR_SRC_DIR}/* ${CORE_ICON_REPO_NAME}/src/svgr/`)
+            console.log('done...!')
         }
 
         if (updateIcons) {
+            console.log('Replacing Icons...')
             input.forEach(async iconName => {
                 const jsIcon = iconName.replace(".svg", ".js")
-                await exec(`rm yb-core-icon/src/svgr/${jsIcon}`)
+                await exec(`rm ${CORE_ICON_REPO_NAME}/src/svgr/${jsIcon}`)
             });
-            await exec(`cp -R dest_svgr/* yb-core-icon/src/svgr/`)
+            await exec(`cp -R ${SVGR_SRC_DIR}/* ${CORE_ICON_REPO_NAME}/src/svgr/`)
+            console.log('done...!')
         }
 
         if (deleteIcons) {
+            console.log('Deleting icons from src...!')
             input.forEach(async iconName => {
                 const jsIcon = iconName.replace(".svg", ".js")
-                await exec(`rm yb-core-icon/src/svgr/${jsIcon}`)
+                await exec(`rm ${CORE_ICON_REPO_NAME}/src/svgr/${jsIcon}`)
             });
+            console.log('done...!')
         }
 
         const readdir = util.promisify(fs.readdir)
-        const filenames = await readdir('./src_svg/')
+        const filenames = await readdir(`${SVG_SRC_PATH}/`)
         const prettifiedFileNames = filenames.length > 0 ? filenames.reduce((pre, crnt) => {
             const val = pre + '\n' + crnt
             return val
@@ -67,40 +80,65 @@ const { clear, debug, avoidNative, deleteIcons, updateIcons, addIcons } = flags;
 
         console.log(`Updating version...`);
         await exec(`./version-incrementor.sh`)
+        console.log('done...!')
 
-        const packageJson = require('./yb-core-icon/package.json')
+        const packageJson = require(`./${CORE_ICON_REPO_NAME}/package.json`)
         const version = packageJson.version
 
         if (addIcons) {
             console.log(`Updating iconIndex.ts...`);
             await exec(`./add-icons-index.sh ADD`)
+            console.log('done...!')
         }
 
         if (deleteIcons) {
             console.log(`Updating iconIndex.ts... (delete operation)`);
             await exec(`./add-icons-index.sh DELETE ${iconNames}`)
+            console.log('done...!')
         }
 
         if (addIcons) {
             console.log(`Updating readme.md...(add operation)`);
             await exec(`./add-icons-readme.sh ${version} ADD`)
+            console.log('done...!')
         }
 
         if (updateIcons) {
             console.log(`Updating readme.md...(update operation)`);
             await exec(`./add-icons-readme.sh ${version} UPDATE`)
+            console.log('done...!')
         }
 
         if (deleteIcons) {
             console.log(`Updating readme.md...(delete operation)`);
             await exec(`./add-icons-readme.sh ${version} DELETE ${iconNames}`)
+            console.log('done...!')
         }
 
+        console.log('Installing node modules...');
+        await exec(`cd ${CORE_ICON_REPO_NAME} && yarn install`)
+        console.log('done...!')
+
+        console.log('Building...');
+        await exec(`cd ${CORE_ICON_REPO_NAME} && yarn build`)
+        console.log('done...!')
+
+        console.log('Prepublish Validating...');
+        await exec(`cd ${CORE_ICON_REPO_NAME} && yarn validate-before-publishing`)
+        console.log('done...!')
+
+        // Perform GIT operations only if the build is successful. 
+        /* Note that yarn build will validate with prepublish validator and will know for sure 
+           if the build can be published or not. If we experience any error we can rollback without
+           having to cleanup anything in github */
+
         console.log(`Adding all uncommited files`);
-        await exec(`cd yb-core-icon && git add .`)
+        await exec(`cd ${CORE_ICON_REPO_NAME} && git add .`)
+        console.log('done...!')
 
         console.log(`Git Status`);
-        await exec(`cd yb-core-icon && git status`)
+        await exec(`cd ${CORE_ICON_REPO_NAME} && git status`)
+        console.log('done...!')
         
         let commitHeader = ""
         let commitDescription = ""
@@ -122,33 +160,35 @@ const { clear, debug, avoidNative, deleteIcons, updateIcons, addIcons } = flags;
 
         console.log(`commiting...`);
         console.log(commitHeader + '\n' + commitDescription)
-        await exec(`cd yb-core-icon && git commit -m '${commitHeader}' -m '${commitDescription}'`)
+        await exec(`cd ${CORE_ICON_REPO_NAME} && git commit -m '${commitHeader}' -m '${commitDescription}'`)
+        console.log('done...!')
 
         console.log('Pushing to cli_update');
-        await exec(`cd yb-core-icon && git push`)
-
-        console.log('Installing node modules...');
-        await exec(`cd yb-core-icon && yarn install`)
-
-        console.log('Building...');
-        await exec(`cd yb-core-icon && yarn build`)
+        await exec(`cd ${CORE_ICON_REPO_NAME} && git push`)
+        console.log('done...!')
 
         console.log('Publishing...');
-        await exec(`cd yb-core-icon && npm publish`)
+        await exec(`cd ${CORE_ICON_REPO_NAME} && npm publish`)
+        console.log('done...!')
 
         console.log('cleaning up...')
-        console.log('Deleting Project folder: yb-core-icon...')
-        await exec(`rm -rf yb-core-icon/`)
 
         console.log('Deleting svg folder...')
-        await exec(`rm -rf src_svg/`)
+        await exec(`rm -rf ${SVG_SRC_DIR}/`)
+        console.log('done...!')
 
         console.log('Deleting svgr folder...')
-        await exec(`rm -rf dest_svgr/`)
+        await exec(`rm -rf ${SVGR_SRC_DIR}/`)
+        console.log('done...!')
 
         console.log('generating required directories...')
-        await exec(`mkdir dest_svgr/`)
-        await exec(`mkdir src_svg/`)
+        await exec(`mkdir ${SVGR_SRC_DIR}/`)
+        await exec(`mkdir ${SVG_SRC_DIR}/`)
+        console.log('done...!')
+
+        console.log(`Deleting Project folder: ${CORE_ICON_REPO_NAME}...`)
+        await exec(`rm -rf ${CORE_ICON_REPO_NAME}/`)
+        console.log('done...!')
 
         console.log('Successfully published Icon Componnet. Version:- ', version)
 

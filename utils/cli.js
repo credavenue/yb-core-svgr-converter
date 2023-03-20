@@ -24,12 +24,6 @@ const flags = {
 		alias: `v`,
 		desc: `Print CLI version`
 	},
-	avoidNative: {
-		type: `boolean`,
-		default: false,
-		alias: `x`,
-		desc: `Converts only for React and discards the support of react-native-svg`
-	},
 	deleteIcons: {
 		type: `boolean`,
 		default: false,
