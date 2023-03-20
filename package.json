@@ -5,7 +5,8 @@
 	"license": "UNLICENSED",
 	"bin": {
 		"yb-core-svgr-converter": "index.js",
-		"yb-svgr-converter": "index.js"
+		"yb-svgr-converter": "index.js",
+		"yb-svgr-publisher": "master-publisher.js"
 	},
 	"author": {
 		"name": "Raja Vijaya Kumar",
@@ -35,5 +36,13 @@
 	},
 	"devDependencies": {
 		"prettier": "^2.8.4"
+	},
+	"publishConfig": {
+		"registry": "https://packages.dso.credavenue.io/@yubi"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git@github.com:credavenue/yb-core-svgr-converter.git",
+		"directory": "./package/index.js"
 	}
 }
