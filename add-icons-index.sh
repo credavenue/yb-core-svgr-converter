@@ -31,7 +31,7 @@ case $1 in
             name="$(echo "$icon" | sed 's/.svg//g')"
 
             # Add the new entry to the temporary file
-            echo "Icons['$icon'] = require('../svgr/$name.js').default;" >> "$temp_file"
+            echo "\"$icon\": { uri: require('../svgr/$name.js') }," >> "$temp_file"
         done
 
         # Insert the new entries into the original file
@@ -58,7 +58,7 @@ case $1 in
             # Loop through each .svg file and custom string pair
             for (( i=0; i<${#icons[@]}; i++ )); do
                 # Check if the line contains the current .svg file
-                if [[ "$line" == *"'${icons[i]}'"* ]]; then
+                if [[ "$line" == *"\"${icons[i]}\""* ]]; then
                     # Replace the line with the current custom string
                     line="// (delete-line-temp-placeholder)"
                     break # Stop searching for this line since we've found a match

@@ -190,7 +190,7 @@ const { clear, debug, avoidNative, deleteIcons, updateIcons, addIcons } = flags;
         await exec(`rm -rf ${CORE_ICON_REPO_NAME}/`)
         console.log('done...!')
 
-        console.log('Successfully published Icon Componnet. Version:- ', version)
+        console.log('Successfully published Icon Component. Version:- ', version)
 
         console.log('Updated ICONS successfully. Check out https://github.com/credavenue/yb-core-icon/')
 
